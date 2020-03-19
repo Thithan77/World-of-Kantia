@@ -39,7 +39,6 @@ while cont:
             x+=32
         x = xmin
         y+=32
-    # print(xmin,"",xmax)
     for event in pygame.event.get():
         if event.type == QUIT:
             cont = False;
@@ -52,14 +51,10 @@ while cont:
                 Miguel.pos["x"] -= 10
             elif event.key == K_d:
                 Miguel.pos["x"] += 10
-            elif event.key == K_f:
-                print("xmin:"+str(xmin))
-                print("xmax:"+str(xmax))
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 destroying = True
                 destroyingPlace = (event.pos[0],event.pos[1])
-                print(destroyingPlace)
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
                 destroying = False
@@ -69,7 +64,6 @@ while cont:
         destroyingTime+=(int(pygame.time.get_ticks())-lastTick)
         x = destroyingPlace[0] + (Miguel.pos["x"] - (width/2))
         y = destroyingPlace[1] + (Miguel.pos["y"] - (height/2))
-        print(surmap[floor(y/32)][floor(x/32)])
         if(surmap[floor(y/32)][floor(x/32)] == "a" and destroyingTime > 4000):
             xM = floor(Miguel.pos["x"]/32)
             yM = floor(Miguel.pos["y"]/32)
