@@ -7,12 +7,31 @@ fen = pygame.display.set_mode((width, height))
 from init import *;
 from perso import *
 from math import *
+isMenuOpen = False
 Miguel = Perso(fen)
 lastTick = int(pygame.time.get_ticks())
 destroyingTime = 0
 destroying = False
 destroyingPlace = (0,0)
 font=pygame.font.Font(None, 24)
+
+menu = "closed"
+def openMenu():
+    global isMenuOpen,menu;
+    isMenuOpen = True
+    menu = "general"
+def menu_update():
+    global isMenuOpen
+    if(isMenuOpen):
+        pygame.draw.rect(pygame.display.get_surface(),(255,150,0),(config.width/4,config.height/4,config.width/2,128))
+        if(menu == "general"):
+            pygame.draw.rect(pygame.display.get_surface(),(0,150,0),(config.width/4+10,config.height/4+10,config.width/2-20,64-20))
+            text = font.render("Quitter le menu",1,(255,255,255))
+            fen.blit(text,(config.width/4+10+125,config.height/4+10+20))
+            pygame.draw.rect(pygame.display.get_surface(),(0,150,0),(config.width/4+10,config.height/4+10+64-20+10,config.width/2-20,64-20))
+            text = font.render("Craft",1,(255,255,255))
+            fen.blit(text,(config.width/4+10+125,config.height/4+10+64))
+
 while cont:
     xmin = Miguel.pos["x"] - (width/2) +32
     xmax = Miguel.pos["x"] + (width/2) +32
@@ -42,7 +61,7 @@ while cont:
     for event in pygame.event.get():
         if event.type == QUIT:
             cont = False;
-        elif event.type == KEYDOWN:
+        elif event.type == KEYDOWN and isMenuOpen == False:
             if event.key == K_w:
                 Miguel.pos["y"] -= 10
             elif event.key == K_s:
@@ -51,6 +70,11 @@ while cont:
                 Miguel.pos["x"] -= 10
             elif event.key == K_d:
                 Miguel.pos["x"] += 10
+            elif event.key == K_e:
+                openMenu()
+                isMenuOpen = True
+        elif event.type == KEYDOWN and isMenuOpen == True:
+            continue;
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 destroying = True
@@ -99,5 +123,6 @@ while cont:
     for i in range(10):
         text = font.render(str(inv[i]),1,(255,255,255))
         fen.blit(text,((config.width-(10*32))/2+(i*32),height-32))
+        menu_update()
     pygame.display.flip()
 pygame.quit()
