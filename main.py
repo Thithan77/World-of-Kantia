@@ -21,21 +21,28 @@ while cont:
         yc = y%32
         for j in range(26):
             xc = x%32
-            if(floor(xc)%10 == 1):
-                fen.blit(pierre,(j*32-xc,i*32-yc))
-            else:
+            if(floor(x/32) <= 0 or floor(y/32) <= 0):
+                fen.blit(vide,(j*32-xc,i*32-yc))
+            elif(map[floor(y/32)][floor(x/32)] == "s"):
                 fen.blit(sol,(j*32-xc,i*32-yc))
+            else:
+                fen.blit(pierre,(j*32-xc,i*32-yc))
             x+=32
         x = xmin
+        y+=32
     # print(xmin,"",xmax)
     for event in pygame.event.get():
         if event.type == QUIT:
             cont = False;
         elif event.type == KEYDOWN:
             if event.key == K_w:
-                Miguel.pos["x"] += 10
+                Miguel.pos["y"] -= 10
             elif event.key == K_s:
                 Miguel.pos["y"] += 10
+            elif event.key == K_a:
+                Miguel.pos["x"] -= 10
+            elif event.key == K_d:
+                Miguel.pos["x"] += 10
             elif event.key == K_f:
                 print("xmin:"+str(xmin))
                 print("xmax:"+str(xmax))
@@ -43,9 +50,9 @@ while cont:
     FPS = floor(1/(time*0.001));
     text = font.render("FPS:"+str(FPS),1,(255,255,255))
     fen.blit(text,(0,0))
-    text = font.render("PosX:"+str(Miguel.pos["x"]),1,(255,255,255))
+    text = font.render("PosX:"+str(floor(Miguel.pos["x"]/32)),1,(255,255,255))
     fen.blit(text,(0,32))
-    text = font.render("PosY:"+str(Miguel.pos["y"]),1,(255,255,255))
+    text = font.render("PosY:"+str(floor(Miguel.pos["y"]/32)),1,(255,255,255))
     fen.blit(text,(0,64))
     lastTick = int(pygame.time.get_ticks())
     Miguel.afficher()
