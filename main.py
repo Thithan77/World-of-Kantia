@@ -8,13 +8,13 @@ from init import *;
 from perso import *
 from math import *
 isMenuOpen = False
-Miguel = Perso(fen)
+Miguel = Perso(fen,perso)
 lastTick = int(pygame.time.get_ticks())
 destroyingTime = 0
 destroying = False
 destroyingPlace = (0,0)
 font=pygame.font.Font(None, 24)
-
+jaaj = 0
 menu = "closed"
 def openMenu():
     global isMenuOpen,menu;
@@ -45,16 +45,17 @@ while cont:
             xc = x%32
             if(floor(x/32) <= 0 or floor(y/32) <= 0):
                 fen.blit(vide,(j*32-xc,i*32-yc))
-            elif(map[floor(y/32)][floor(x/32)] == "s"):
-                fen.blit(sol,(j*32-xc,i*32-yc))
             else:
-                fen.blit(pierre,(j*32-xc,i*32-yc))
-            if(floor(x/32) <= 0 or floor(y/32) <= 0):
+                yz = floor(y/32)
+                xz = floor(x/32)
+                texture = Tile.tiles[map[int(xz)][int(yz)]].texture
+                #texture = Tile.tiles[0].texture
+                fen.blit(texture,((j)*32-xc,(i)*32-yc))
+            if(floor(x/32) <= 0 or floor(y/32) <= 0 or floor(x/32) <= 0 or floor(y/32) <= 0):
                 fen.blit(vide,(j*32-xc,i*32-yc))
-            elif(surmap[floor(y/32)-1][floor(x/32)-1] == "a"):
-                fen.blit(arbre,((j)*32-xc,(i)*32-yc))
-            elif(surmap[floor(y/32)-1][floor(x/32)-1] == "c"):
-                fen.blit(cailloux,((j)*32-xc,(i)*32-yc))
+            else:
+                texture = Tile.tiles[surmap[int(xz)-1][int(yz)-1]].texture
+                fen.blit(texture,(j*32-xc,i*32-yc))
             x+=32
         x = xmin
         y+=32
@@ -79,6 +80,8 @@ while cont:
             if event.button == 1:
                 destroying = True
                 destroyingPlace = (event.pos[0],event.pos[1])
+                #print(floor(destroyingPlace[0]/32),end="/")
+                #print(floor(destroyingPlace[1]/32))
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
                 destroying = False
@@ -88,25 +91,30 @@ while cont:
         destroyingTime+=(int(pygame.time.get_ticks())-lastTick)
         x = destroyingPlace[0] + (Miguel.pos["x"] - (width/2))
         y = destroyingPlace[1] + (Miguel.pos["y"] - (height/2))
-        if(surmap[floor(y/32)][floor(x/32)] == "a" and destroyingTime > 4000):
+        if(surmap[floor(x/32)][floor(y/32)] == 2 and destroyingTime > 4000):
             xM = floor(Miguel.pos["x"]/32)
             yM = floor(Miguel.pos["y"]/32)
             xO = floor(x/32)
             yO = floor(y/32)
+            #print(xO,"",yO)
             d = sqrt((xO-xM)*(xO-xM)+(yO-yM)*(yO-yM))
+            print(d)
             if(d < 4):
-                surmap[floor(y/32)][floor(x/32)] = "v"
+                surmap[xO][yO] = 4
                 inv[0]+=1;
-        elif(surmap[floor(y/32)][floor(x/32)] == "c" and destroyingTime > 4000):
+        elif(surmap[floor(x/32)][floor(y/32)] == 3 and destroyingTime > 4000):
             xM = floor(Miguel.pos["x"]/32)
             yM = floor(Miguel.pos["y"]/32)
             xO = floor(x/32)
             yO = floor(y/32)
             d = sqrt((xO-xM)*(xO-xM)+(yO-yM)*(yO-yM))
             if(d < 4):
-                surmap[floor(y/32)][floor(x/32)] = "v"
+                surmap[floor(y/32)][floor(x/32)] = 4
                 inv[1]+=1;
-    FPS = floor(1/(time*0.001));
+    if(time*0.001 != 0):
+        FPS = floor(1/(time*0.001));
+    else:
+        FPS = 1
     text = font.render("GAMEPLAY EXPERIMENTAL:",1,(255,255,255))
     fen.blit(text,(0,0))
     text = font.render("FPS:"+str(FPS),1,(255,255,255))
