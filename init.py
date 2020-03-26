@@ -13,8 +13,8 @@ perso = pygame.image.load("assets/perso.png").convert_alpha()
 # Init tiles
 Tile("sol",texture="sprite_016.png")
 Tile("pierre",texture="sprite_007.png")
-Tile("arbre",doPass=False,texture="arbre.png")
-Tile("cailloux",texture="cailloux.png")
+Tile("arbre",doPass=False,texture="arbre.png",dropItem=1)
+Tile("cailloux",doPass=False,texture="cailloux.png",dropItem=2)
 Tile("vide")
 
 map = [0]*1000

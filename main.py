@@ -109,7 +109,7 @@ while cont:
             yO = floor(y/32)
             d = sqrt((xO-xM)*(xO-xM)+(yO-yM)*(yO-yM))
             if(d < 4):
-                surmap[floor(y/32)][floor(x/32)] = 4
+                surmap[xO][yO] = 4
                 inv[1]+=1;
     if(time*0.001 != 0):
         FPS = floor(1/(time*0.001));
