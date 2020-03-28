@@ -10,12 +10,14 @@ from math import *
 isMenuOpen = False
 Miguel = Perso(fen,perso)
 lastTick = int(pygame.time.get_ticks())
+tickCount = 0
 destroyingTime = 0
 destroying = False
 destroyingPlace = (0,0)
 font=pygame.font.Font(None, 24)
 jaaj = 0
 menu = "closed"
+lastTickReal = pygame.time.get_ticks()
 def openMenu():
     global isMenuOpen,menu;
     isMenuOpen = True
@@ -86,9 +88,11 @@ while cont:
             if event.button == 1:
                 destroying = False
                 destroyingTime = 0
-    time = int(pygame.time.get_ticks())-lastTick
+    if(tickCount % 100 == 0):
+        time = int(pygame.time.get_ticks())-lastTick
+        lastTick = int(pygame.time.get_ticks())
     if(destroying):
-        destroyingTime+=(int(pygame.time.get_ticks())-lastTick)
+        destroyingTime+=(int(pygame.time.get_ticks())-lastTickReal)
         x = destroyingPlace[0] + (Miguel.pos["x"] - (width/2))
         y = destroyingPlace[1] + (Miguel.pos["y"] - (height/2))
         if(surmap[floor(x/32)][floor(y/32)] == 2 and destroyingTime > 4000):
@@ -112,7 +116,10 @@ while cont:
                 surmap[xO][yO] = 4
                 inv[1]+=1;
     if(time*0.001 != 0):
-        FPS = floor(1/(time*0.001));
+        if(tickCount % 100 == 0):
+            FPS = floor(1/((time*0.001)/100));
+        else:
+            pass;
     else:
         FPS = 1
     text = font.render("GAMEPLAY EXPERIMENTAL:",1,(255,255,255))
@@ -125,12 +132,13 @@ while cont:
     fen.blit(text,(0,96))
     text = font.render("DestroyingTime:"+str(destroyingTime),1,(255,255,255))
     fen.blit(text,(0,96+32))
-    lastTick = int(pygame.time.get_ticks())
     Miguel.afficher()
     pygame.draw.rect(fen,(0,0,150),((config.width-(10*32))/2,height-32,10*32,32))
     for i in range(10):
         text = font.render(str(inv[i]),1,(255,255,255))
         fen.blit(text,((config.width-(10*32))/2+(i*32),height-32))
         menu_update()
+    tickCount+=1
+    lastTickReal = pygame.time.get_ticks()
     pygame.display.flip()
 pygame.quit()

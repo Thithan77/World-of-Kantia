@@ -13,7 +13,9 @@ perso = pygame.image.load("assets/perso.png").convert_alpha()
 # Init tiles
 Tile("sol",texture="sprite_016.png")
 Tile("pierre",texture="sprite_007.png")
-Tile("arbre",doPass=False,texture="arbre.png",dropItem=1)
+conf = {"texture":"arbre.png","doPass":False,"dropItem":1}
+Tile("arbre",**conf)
+#Tile("arbre",doPass=False,texture="arbre.png",dropItem=1)
 Tile("cailloux",doPass=False,texture="cailloux.png",dropItem=2)
 Tile("vide")
 
