@@ -7,7 +7,7 @@ fen = pygame.display.set_mode((width, height))
 from init import *;
 from perso import *
 from math import *
-isMenuOpen = False
+from inv import *
 Miguel = Perso(fen,perso)
 lastTick = int(pygame.time.get_ticks())
 tickCount = 0
@@ -16,24 +16,7 @@ destroying = False
 destroyingPlace = (0,0)
 font=pygame.font.Font(None, 24)
 jaaj = 0
-menu = "closed"
 lastTickReal = pygame.time.get_ticks()
-def openMenu():
-    global isMenuOpen,menu;
-    isMenuOpen = True
-    menu = "general"
-def menu_update():
-    global isMenuOpen
-    if(isMenuOpen):
-        pygame.draw.rect(pygame.display.get_surface(),(255,150,0),(config.width/4,config.height/4,config.width/2,128))
-        if(menu == "general"):
-            pygame.draw.rect(pygame.display.get_surface(),(0,150,0),(config.width/4+10,config.height/4+10,config.width/2-20,64-20))
-            text = font.render("Quitter le menu",1,(255,255,255))
-            fen.blit(text,(config.width/4+10+125,config.height/4+10+20))
-            pygame.draw.rect(pygame.display.get_surface(),(0,150,0),(config.width/4+10,config.height/4+10+64-20+10,config.width/2-20,64-20))
-            text = font.render("Craft",1,(255,255,255))
-            fen.blit(text,(config.width/4+10+125,config.height/4+10+64))
-
 while cont:
     xmin = Miguel.pos["x"] - (width/2) +32
     xmax = Miguel.pos["x"] + (width/2) +32
@@ -64,7 +47,7 @@ while cont:
     for event in pygame.event.get():
         if event.type == QUIT:
             cont = False;
-        elif event.type == KEYDOWN and isMenuOpen == False:
+        elif event.type == KEYDOWN:
             if event.key == K_w:
                 Miguel.pos["y"] -= 10
             elif event.key == K_s:
@@ -73,11 +56,6 @@ while cont:
                 Miguel.pos["x"] -= 10
             elif event.key == K_d:
                 Miguel.pos["x"] += 10
-            elif event.key == K_e:
-                openMenu()
-                isMenuOpen = True
-        elif event.type == KEYDOWN and isMenuOpen == True:
-            continue;
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 destroying = True
@@ -90,31 +68,23 @@ while cont:
                 destroyingTime = 0
     if(tickCount % 100 == 0):
         time = int(pygame.time.get_ticks())-lastTick
-        lastTick = int(pygame.time.get_ticks())
     if(destroying):
         destroyingTime+=(int(pygame.time.get_ticks())-lastTickReal)
         x = destroyingPlace[0] + (Miguel.pos["x"] - (width/2))
         y = destroyingPlace[1] + (Miguel.pos["y"] - (height/2))
-        if(surmap[floor(x/32)][floor(y/32)] == 2 and destroyingTime > 4000):
-            xM = floor(Miguel.pos["x"]/32)
-            yM = floor(Miguel.pos["y"]/32)
-            xO = floor(x/32)
-            yO = floor(y/32)
-            #print(xO,"",yO)
-            d = sqrt((xO-xM)*(xO-xM)+(yO-yM)*(yO-yM))
-            print(d)
-            if(d < 4):
-                surmap[xO][yO] = 4
-                inv[0]+=1;
-        elif(surmap[floor(x/32)][floor(y/32)] == 3 and destroyingTime > 4000):
+        if(destroyingTime > 4000):
             xM = floor(Miguel.pos["x"]/32)
             yM = floor(Miguel.pos["y"]/32)
             xO = floor(x/32)
             yO = floor(y/32)
             d = sqrt((xO-xM)*(xO-xM)+(yO-yM)*(yO-yM))
             if(d < 4):
-                surmap[xO][yO] = 4
-                inv[1]+=1;
+                if(Tile.tiles[surmap[floor(x/32)][floor(y/32)]].dropItem != "null"):
+                    #inv[Tile.tiles[surmap[floor(x/32)][floor(y/32)]].dropItem]["n"] += 1
+                    Inv.add(Item.items[Tile.tiles[surmap[floor(x/32)][floor(y/32)]].dropItem].nom,1)
+                    surmap[floor(x/32)][floor(y/32)] = Tile.nameToNumber["vide"]
+                    destroyingTime = 0
+
     if(time*0.001 != 0):
         if(tickCount % 100 == 0):
             FPS = floor(1/((time*0.001)/100));
@@ -133,11 +103,17 @@ while cont:
     text = font.render("DestroyingTime:"+str(destroyingTime),1,(255,255,255))
     fen.blit(text,(0,96+32))
     Miguel.afficher()
-    pygame.draw.rect(fen,(0,0,150),((config.width-(10*32))/2,height-32,10*32,32))
+    #pygame.draw.rect(fen,(0,0,150),((config.width-(10*32))/2,height-32,10*32,32))
+    inventaire = pygame.Surface((48*10,48));
     for i in range(10):
-        text = font.render(str(inv[i]),1,(255,255,255))
-        fen.blit(text,((config.width-(10*32))/2+(i*32),height-32))
-        menu_update()
+        case = pygame.Surface((48,48))
+        text = font.render(str(Inv.list[i]["n"]),1,(255,255,255))
+        w,h = text.get_size()
+        case.blit(text,(48-w,48-h))
+        case.blit(Item.items[Item.nameToNumber[Inv.list[i]["type"]]].texture,(16,16))
+        inventaire.blit(case,(i*48,0))
+    w , h = inventaire.get_size()
+    fen.blit(inventaire,(0,height-h))
     tickCount+=1
     lastTickReal = pygame.time.get_ticks()
     pygame.display.flip()
